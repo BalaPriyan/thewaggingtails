@@ -1,54 +1,7 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
 import { ShieldCheck, Heart, UserCheck, Camera, Sparkles } from "lucide-react";
-
-// Native scroll reveal helper with dynamic initial state class and viewport exit reset
-const RevealOnScroll = ({
-  children,
-  delay = 0,
-  className = "",
-  invisibleClass = "opacity-0 translate-x-32 scale-90"
-}: {
-  children: React.ReactNode;
-  delay?: number;
-  className?: string;
-  invisibleClass?: string;
-}) => {
-  const [isVisible, setIsVisible] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsVisible(entry.isIntersecting);
-      },
-      { threshold: 0.15, rootMargin: "0px 0px -30px 0px" }
-    );
-
-    const currentRef = ref.current;
-    if (currentRef) {
-      observer.observe(currentRef);
-    }
-
-    return () => {
-      if (currentRef) {
-        observer.unobserve(currentRef);
-      }
-    };
-  }, []);
-
-  return (
-    <div
-      ref={ref}
-      style={{ transitionDelay: `${delay}ms` }}
-      className={`transition-all duration-700 ease-out ${isVisible ? "opacity-100 translate-x-0 scale-100 animate-float" : invisibleClass
-        } ${className}`}
-    >
-      {children}
-    </div>
-  );
-};
 
 // Beautiful large Paw Card Background SVG
 const PawCardBg = ({ color }: { color: string }) => (
@@ -92,7 +45,7 @@ const REASONS = [
     description: "A clean, pet-friendly space designed for companion safety.",
     color: "#ebdfff",
     icon: <ShieldCheck className="w-5 h-5 text-[#2d1f47]" />,
-    rotateClass: "rotate-[-6deg]",
+    rotateClass: "md:rotate-[-4deg] rotate-[-1deg]",
     zIndexClass: "z-10"
   },
   {
@@ -100,7 +53,7 @@ const REASONS = [
     description: "Every guest receives individual attention and affection.",
     color: "#ffebd2",
     icon: <Heart className="w-5 h-5 text-[#2d1f47]" />,
-    rotateClass: "rotate-[4deg]",
+    rotateClass: "md:rotate-[3deg] rotate-[1deg]",
     zIndexClass: "z-20"
   },
   {
@@ -108,7 +61,7 @@ const REASONS = [
     description: "Passionate animal lovers dedicated to guest enjoyment.",
     color: "#d2f4ff",
     icon: <UserCheck className="w-5 h-5 text-[#2d1f47]" />,
-    rotateClass: "rotate-[-4deg]",
+    rotateClass: "md:rotate-[-3deg] rotate-[-1deg]",
     zIndexClass: "z-30"
   },
   {
@@ -116,7 +69,7 @@ const REASONS = [
     description: "Photos and videos sent so you stay connected throughout.",
     color: "#bdf4c5",
     icon: <Camera className="w-5 h-5 text-[#2d1f47]" />,
-    rotateClass: "rotate-[6deg]",
+    rotateClass: "md:rotate-[4deg] rotate-[1deg]",
     zIndexClass: "z-40"
   },
   {
@@ -124,7 +77,7 @@ const REASONS = [
     description: "From dietary schedules to favorite toys, cared for your way.",
     color: "#fee8c8",
     icon: <Sparkles className="w-5 h-5 text-[#2d1f47]" />,
-    rotateClass: "rotate-[-3deg]",
+    rotateClass: "md:rotate-[-2deg] rotate-[-1deg]",
     zIndexClass: "z-50"
   }
 ];
@@ -133,11 +86,11 @@ export default function WhyChooseUs() {
   return (
     <section
       id="why-choose-us"
-      className="relative bg-[#faf6f0] py-20 select-none border-t border-[#2d1f47]/10 overflow-hidden"
+      className="relative bg-[#faf6f0] py-16 md:py-20 select-none border-t border-[#2d1f47]/10 overflow-hidden"
     >
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
 
-        <div className="text-center mb-10 space-y-2 relative z-50">
+        <div className="text-center mb-10 md:mb-16 space-y-2 relative z-50">
           <span className="text-[10px] bg-[#dfd5fc] border border-[#2d1f47] text-[#2d1f47] font-black uppercase tracking-widest px-3.5 py-1.5 rounded-full inline-block shadow-xs">
             Why Pet Parents Trust Us
           </span>
@@ -149,39 +102,32 @@ export default function WhyChooseUs() {
           </p>
         </div>
 
-        {/* Central Deck Stack Container - standard layout with zero extra vertical scroll spacing */}
-        <div className="max-w-xl mx-auto grid grid-cols-1 justify-items-center items-center w-full px-4 min-h-[300px] relative overflow-visible">
+        {/* Responsive Grid/Flex layout of cards - no animation */}
+        <div className="flex flex-wrap justify-center gap-6 md:gap-8 max-w-7xl mx-auto px-2 relative overflow-visible">
           {REASONS.map((item, idx) => (
-            <RevealOnScroll
+            <div
               key={idx}
-              delay={idx * 180}
-              invisibleClass="opacity-0 translate-x-[240px] rotate-[20deg] scale-90 pointer-events-none"
-              className={`col-start-1 row-start-1 `}
+              className={`relative w-[250px] sm:w-[280px] h-[230px] sm:h-[260px] p-5 sm:p-6 pt-16 sm:pt-24 pb-6 sm:pb-8 flex flex-col items-center justify-center text-center group cursor-pointer transition-transform duration-300 hover:scale-105 hover:z-10 ${item.rotateClass}`}
             >
-              {/* Paw Card Wrapper */}
-              <div
-                className={`relative w-[280px] h-[260px] p-6 pt-24 pb-8 flex flex-col items-center justify-center text-center group cursor-pointer transition-all duration-300 hover:scale-105 hover:z-50 ${item.rotateClass}`}
-              >
-                {/* SVG Background Paw shape */}
-                <PawCardBg color={item.color} />
+              {/* SVG Background Paw shape */}
+              <PawCardBg color={item.color} />
 
-                {/* Card Content inside main pad */}
-                <div className="relative z-10 space-y-2.5 px-4 max-w-[200px]">
-                  <div className="w-8 h-8 bg-white border border-[#2d1f47]/30 rounded-xl flex items-center justify-center text-[#2d1f47] mx-auto shadow-2xs">
-                    {item.icon}
-                  </div>
-                  <div className="space-y-0.5">
-                    <h4 className="font-bold text-[13px] sm:text-sm text-[#2d1f47] leading-tight">
-                      {item.title}
-                    </h4>
-                    <p className="text-[10px] sm:text-xs text-[#2d1f47]/80 font-semibold leading-relaxed">
-                      {item.description}
-                    </p>
-                  </div>
+              {/* Card Content inside main pad */}
+              <div className="relative z-10 space-y-2.5 px-4 max-w-[200px]">
+                <div className="w-8 h-8 bg-white border border-[#2d1f47]/30 rounded-xl flex items-center justify-center text-[#2d1f47] mx-auto shadow-2xs">
+                  {item.icon}
                 </div>
-
+                <div className="space-y-0.5">
+                  <h4 className="font-bold text-[13px] sm:text-sm text-[#2d1f47] leading-tight">
+                    {item.title}
+                  </h4>
+                  <p className="text-[10px] sm:text-xs text-[#2d1f47]/80 font-semibold leading-relaxed">
+                    {item.description}
+                  </p>
+                </div>
               </div>
-            </RevealOnScroll>
+
+            </div>
           ))}
         </div>
 

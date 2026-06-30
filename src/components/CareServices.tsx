@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 // Daisy Flower component
 const DaisyIcon = () => (
@@ -170,6 +171,57 @@ const RevealOnScroll = ({ children, delay = 0, className = "" }: { children: Rea
 };
 
 export default function CareServices() {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+  const [hasDragged, setHasDragged] = useState(false);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!scrollContainerRef.current) return;
+    setIsDragging(true);
+    setHasDragged(false);
+    setStartX(e.pageX - scrollContainerRef.current.offsetLeft);
+    setScrollLeft(scrollContainerRef.current.scrollLeft);
+  };
+
+  const handleMouseLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !scrollContainerRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - scrollContainerRef.current.offsetLeft;
+    const walk = (x - startX) * 1.5; // Scroll speed factor
+    if (Math.abs(walk) > 5) {
+      setHasDragged(true);
+    }
+    scrollContainerRef.current.scrollLeft = scrollLeft - walk;
+  };
+
+  const scrollLeftBtn = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({
+        left: -340,
+        behavior: "smooth"
+      });
+    }
+  };
+
+  const scrollRightBtn = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({
+        left: 340,
+        behavior: "smooth"
+      });
+    }
+  };
+
   const scrollToBooking = (e: React.MouseEvent) => {
     e.preventDefault();
     const element = document.getElementById("booking");
@@ -179,72 +231,109 @@ export default function CareServices() {
   };
 
   return (
-    <section id="services" className="bg-[#ffffff] py-20 select-none border-t border-[#2d1f47]/10">
+    <section id="services" className="bg-[#ffffff] py-20 select-none border-t border-[#2d1f47]/10 overflow-hidden">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-16 space-y-2">
-          <span className="text-[10px] bg-[#ffd54f] border border-[#2d1f47] text-[#2d1f47] font-black uppercase tracking-widest px-3.5 py-1.5 rounded-full inline-block shadow-xs">
-            What We Do
-          </span>
-          <h2 className="text-3xl sm:text-4xl font-display text-[#2d1f47] tracking-tight">
-            Our Services
-          </h2>
-          <p className="text-[#2d1f47]/70 text-sm sm:text-base font-semibold max-w-lg mx-auto">
-            Comprehensive care options customized for your companion&apos;s physical health, hygiene, and behavior routines.
-          </p>
+        
+        {/* Header containing title and navigation arrows */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+          <div className="text-left space-y-2">
+            <span className="text-[10px] bg-[#ffd54f] border border-[#2d1f47] text-[#2d1f47] font-black uppercase tracking-widest px-3.5 py-1.5 rounded-full inline-block shadow-xs">
+              What We Do
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-display text-[#2d1f47] tracking-tight">
+              Our Services
+            </h2>
+            <p className="text-[#2d1f47]/70 text-sm sm:text-base font-semibold max-w-lg">
+              Comprehensive care options customized for your companion&apos;s physical health, hygiene, and behavior routines.
+            </p>
+          </div>
+          
+          {/* Scroll Buttons */}
+          <div className="flex items-center gap-3 shrink-0">
+            <button
+              onClick={scrollLeftBtn}
+              className="w-12 h-12 rounded-2xl border-2 border-[#2d1f47] bg-white flex items-center justify-center text-[#2d1f47] shadow-[2px_2px_0px_#2d1f47] hover:bg-[#faf6f0] active:translate-y-0.5 active:translate-x-0.5 active:shadow-[1px_1px_0px_#2d1f47] transition-all cursor-pointer"
+              aria-label="Scroll left"
+            >
+              <ChevronLeft className="w-5 h-5 stroke-[2.5]" />
+            </button>
+            <button
+              onClick={scrollRightBtn}
+              className="w-12 h-12 rounded-2xl border-2 border-[#2d1f47] bg-[#ffd54f] flex items-center justify-center text-[#2d1f47] shadow-[2px_2px_0px_#2d1f47] hover:bg-[#ffe082] active:translate-y-0.5 active:translate-x-0.5 active:shadow-[1px_1px_0px_#2d1f47] transition-all cursor-pointer"
+              aria-label="Scroll right"
+            >
+              <ChevronRight className="w-5 h-5 stroke-[2.5]" />
+            </button>
+          </div>
         </div>
 
-        {/* Wavy Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12">
-          {SERVICES.map((srv, idx) => (
-            <RevealOnScroll key={idx} delay={(idx % 4) * 100}>
-              <div
-                onClick={scrollToBooking}
-                className="relative p-8 flex flex-col justify-between min-h-[460px] group cursor-pointer"
-              >
-                {/* Wavy Background (Displacement filter applied only to this background container) */}
-                <div 
-                  className={`absolute inset-0 border-[3.5px] border-[#2d1f47] rounded-[48px] z-0 pointer-events-none transition-transform duration-300 group-hover:scale-[1.02] shadow-[2px_2px_0px_#2d1f47] group-hover:shadow-[4px_4px_0px_#2d1f47] ${srv.bgColorClass}`}
-                  style={{ filter: "url(#wavy-card-filter)" }}
-                />
+        {/* Wavy Cards horizontal scroll / draggable container */}
+        <RevealOnScroll delay={100}>
+          <div
+            ref={scrollContainerRef}
+            onMouseDown={handleMouseDown}
+            onMouseLeave={handleMouseLeave}
+            onMouseUp={handleMouseUp}
+            onMouseMove={handleMouseMove}
+            className="flex gap-8 overflow-x-auto pb-10 pt-4 px-2 scrollbar-hide snap-x snap-mandatory cursor-grab active:cursor-grabbing select-none"
+          >
+            {SERVICES.map((srv, idx) => (
+              <div key={idx} className="shrink-0 snap-start">
+                <div
+                  onClick={(e) => {
+                    if (hasDragged) {
+                      e.preventDefault();
+                      return;
+                    }
+                    scrollToBooking(e);
+                  }}
+                  className="relative p-8 flex flex-col justify-between min-h-[460px] w-[280px] sm:w-[320px] group cursor-pointer"
+                >
+                  {/* Wavy Background (Displacement filter applied only to this background container) */}
+                  <div 
+                    className={`absolute inset-0 border-[3.5px] border-[#2d1f47] rounded-[48px] z-0 pointer-events-none transition-transform duration-300 group-hover:scale-[1.02] shadow-[2px_2px_0px_#2d1f47] group-hover:shadow-[4px_4px_0px_#2d1f47] ${srv.bgColorClass}`}
+                    style={{ filter: "url(#wavy-card-filter)" }}
+                  />
 
-                {/* Card Content (Stays clean and sharp) */}
-                <div className="relative z-10 space-y-4">
-                  <h3 className="text-2xl font-display text-[#2d1f47] leading-tight">
-                    {srv.title}
-                  </h3>
-                  <p className="text-[#2d1f47]/80 text-sm font-semibold leading-relaxed">
-                    {srv.description}
-                  </p>
-                </div>
+                  {/* Card Content (Stays clean and sharp) */}
+                  <div className="relative z-10 space-y-4">
+                    <h3 className="text-2xl font-display text-[#2d1f47] leading-tight">
+                      {srv.title}
+                    </h3>
+                    <p className="text-[#2d1f47]/80 text-sm font-semibold leading-relaxed">
+                      {srv.description}
+                    </p>
+                  </div>
 
-                {/* Graphic, Black Title Tag, Yellow Detail Badge & Daisy Flower */}
-                <div className="relative z-10 flex flex-col items-center pt-6">
-                  
-                  {/* Illustration wrapper */}
-                  <div className="relative">
-                    {srv.illustration}
+                  {/* Graphic, Black Title Tag, Yellow Detail Badge & Daisy Flower */}
+                  <div className="relative z-10 flex flex-col items-center pt-6">
                     
-                    {/* Floating Daisy Flower */}
-                    <div className="absolute -top-1 -right-2 z-20">
-                      <DaisyIcon />
+                    {/* Illustration wrapper */}
+                    <div className="relative">
+                      {srv.illustration}
+                      
+                      {/* Floating Daisy Flower */}
+                      <div className="absolute -top-1 -right-2 z-20">
+                        <DaisyIcon />
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Brand Banner (Black pill) */}
-                  <div className="bg-[#2d1f47] border border-[#2d1f47] text-white text-[9px] font-black uppercase tracking-widest px-4.5 py-1.5 rounded-md -mt-1.5 relative z-10 shadow-sm text-center">
-                    THE WAGGING TAILS
-                  </div>
+                    {/* Brand Banner (Black pill) */}
+                    <div className="bg-[#2d1f47] border border-[#2d1f47] text-white text-[9px] font-black uppercase tracking-widest px-4.5 py-1.5 rounded-md -mt-1.5 relative z-10 shadow-sm text-center">
+                      THE WAGGING TAILS
+                    </div>
 
-                  {/* Detail Banner (Yellow pill) */}
-                  <div className="bg-[#ffd54f] border border-[#2d1f47] text-[#2d1f47] text-[8px] font-black uppercase tracking-wider px-3.5 py-1 rounded-sm mt-1.5 relative z-10 shadow-xs text-center">
-                    {srv.title}
-                  </div>
+                    {/* Detail Banner (Yellow pill) */}
+                    <div className="bg-[#ffd54f] border border-[#2d1f47] text-[#2d1f47] text-[8px] font-black uppercase tracking-wider px-3.5 py-1 rounded-sm mt-1.5 relative z-10 shadow-xs text-center">
+                      {srv.title}
+                    </div>
 
+                  </div>
                 </div>
               </div>
-            </RevealOnScroll>
-          ))}
-        </div>
+            ))}
+          </div>
+        </RevealOnScroll>
       </div>
     </section>
   );
